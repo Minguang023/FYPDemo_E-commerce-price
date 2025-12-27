@@ -287,7 +287,7 @@ def create_dashboard():
         st.markdown(f"""
             <div class="metric-card">
                 <h3>💰 Avg Price</h3>
-                <h2>R$ {avg_price:.2f}</h2>
+                <h2>RM {avg_price:.2f}</h2>
                 <p>Mean prediction</p>
             </div>
         """, unsafe_allow_html=True)
@@ -296,7 +296,7 @@ def create_dashboard():
         st.markdown(f"""
             <div class="metric-card">
                 <h3>📈 Highest Price</h3>
-                <h2>R$ {max_price:.2f}</h2>
+                <h2>RM {max_price:.2f}</h2>
                 <p>Maximum</p>
             </div>
         """, unsafe_allow_html=True)
@@ -305,7 +305,7 @@ def create_dashboard():
         st.markdown(f"""
             <div class="metric-card">
                 <h3>💵 Total Value</h3>
-                <h2>R$ {total_value:.2f}</h2>
+                <h2>RM {total_value:.2f}</h2>
                 <p>Sum of all</p>
             </div>
         """, unsafe_allow_html=True)
@@ -354,7 +354,7 @@ def create_dashboard():
         x='predicted_price',
         nbins=20,
         title='Distribution of Predicted Prices',
-        labels={'predicted_price': 'Price (R$)'},
+        labels={'predicted_price': 'Price (RM)'},
         color_discrete_sequence=['#1f77b4']
     )
     fig3.update_layout(showlegend=False)
@@ -363,7 +363,7 @@ def create_dashboard():
     # Recent predictions table
     st.markdown("### 📋 Recent Predictions")
     recent_df = df.tail(10).copy()
-    recent_df['predicted_price'] = recent_df['predicted_price'].apply(lambda x: f"R$ {x:.2f}")
+    recent_df['predicted_price'] = recent_df['predicted_price'].apply(lambda x: f"RM {x:.2f}")
     st.dataframe(recent_df, use_container_width=True)
     
     # Clear history button
@@ -529,7 +529,7 @@ def manual_input_form(model, preprocessor, feature_names, categories):
             )
             
             payment_value = st.number_input(
-                "Payment Value (R$)",
+                "Payment Value (RM)",
                 min_value=0.0,
                 max_value=10000.0,
                 value=100.0,
@@ -572,7 +572,7 @@ def manual_input_form(model, preprocessor, feature_names, categories):
                 st.markdown(f"""
                     <div class="prediction-result">
                         <h2>💰 Predicted Price</h2>
-                        <h1>R$ {prediction:.2f}</h1>
+                        <h1>RM {prediction:.2f}</h1>
                         <p>Confidence: High ✅</p>
                     </div>
                 """, unsafe_allow_html=True)
@@ -580,9 +580,9 @@ def manual_input_form(model, preprocessor, feature_names, categories):
                 # Additional insights
                 col1, col2, col3 = st.columns(3)
                 with col1:
-                    st.metric("Price Range (±10%)", f"R$ {prediction*0.9:.2f} - R$ {prediction*1.1:.2f}")
+                    st.metric("Price Range (±10%)", f"RM {prediction*0.9:.2f} - RM {prediction*1.1:.2f}")
                 with col2:
-                    st.metric("Category Average", f"R$ {payment_value:.2f}")
+                    st.metric("Category Average", f"RM {payment_value:.2f}")
                 with col3:
                     st.metric("Payment Installments", payment_installments)
 
@@ -670,9 +670,9 @@ def csv_upload_form(model, preprocessor, feature_names):
                     with col1:
                         st.metric("Total Predictions", len(predictions))
                     with col2:
-                        st.metric("Average Price", f"R$ {np.mean(predictions):.2f}")
+                        st.metric("Average Price", f"RM {np.mean(predictions):.2f}")
                     with col3:
-                        st.metric("Total Value", f"R$ {np.sum(predictions):.2f}")
+                        st.metric("Total Value", f"RM {np.sum(predictions):.2f}")
                     
                     # Display results
                     st.markdown("### 📊 Prediction Results")
@@ -691,7 +691,7 @@ def csv_upload_form(model, preprocessor, feature_names):
                     # Visualization
                     fig = px.histogram(df, x='Predicted_Price', nbins=30,
                                      title='Distribution of Predicted Prices',
-                                     labels={'Predicted_Price': 'Price (R$)'},
+                                     labels={'Predicted_Price': 'Price (RM)'},
                                      color_discrete_sequence=['#1f77b4'])
                     st.plotly_chart(fig, use_container_width=True)
         
@@ -762,9 +762,9 @@ def main():
             - MAE: 15.64
             - MAPE: 21.34%
             
-            **Training Data:** Brazilian E-Commerce Dataset (Global Model)
+            **Training Dataset:** Brazilian E-Commerce Dataset
             
-            **Features:** 13 input → 92 encoded → 10 selected (No location data)
+            **Features:** 13 input → 92 encoded → 10 selected features for prediction.
         """)
     
     # Main content
