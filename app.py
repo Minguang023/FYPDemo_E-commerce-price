@@ -407,10 +407,13 @@ def predict_price(model, preprocessor, feature_names, input_data):
             if feat_name in all_feature_names:
                 feat_idx = all_feature_names.index(feat_name)
                 X_final[0, i] = X_encoded[0, feat_idx]
-            # If feature doesn't exist (e.g., seller not in SP, category not watches/telephony), it stays 0
+            # If feature doesn't exist (e.g., category not in training), it stays 0
+        
+        # Convert to DataFrame with feature names (model was trained with DataFrame)
+        X_final_df = pd.DataFrame(X_final, columns=feature_names)
         
         # Make prediction
-        prediction = model.predict(X_final)
+        prediction = model.predict(X_final_df)
         
         # Store prediction in session state for dashboard tracking
         prediction_record = {
