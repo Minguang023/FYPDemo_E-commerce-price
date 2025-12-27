@@ -77,7 +77,7 @@ def download_model_from_drive():
         return True
     
     # Google Drive file ID from your link
-    file_id = '1P51FTpCvxZMydx1pKmWU-ec2RO4oek72'
+    file_id = '1x619bwFCEdxtJdGxXqeo1hiUpvVU-pf3'
     url = f'https://drive.google.com/uc?id={file_id}'
     
     try:
@@ -92,11 +92,11 @@ def download_model_from_drive():
             return True
         else:
             st.error("❌ Download failed - file not created")
-            st.info("💡 Manual download: https://drive.google.com/file/d/1bMOEUXzqzB0zxj0iKYr4HajE0HPRk6MW/view")
+            st.info("💡 Manual download: https://drive.google.com/file/d/1x619bwFCEdxtJdGxXqeo1hiUpvVU-pf3/view")
             return False
     except Exception as e:
         st.error(f"❌ Download error: {str(e)}")
-        st.info("💡 Manual download: https://drive.google.com/file/d/1bMOEUXzqzB0zxj0iKYr4HajE0HPRk6MW/view")
+        st.info("💡 Manual download: https://drive.google.com/file/d/1x619bwFCEdxtJdGxXqeo1hiUpvVU-pf3/view")
         return False
 
 # Load the model (with auto-download from Google Drive)
