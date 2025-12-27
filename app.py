@@ -440,151 +440,196 @@ def manual_input_form(model, preprocessor, feature_names, categories):
     
     st.markdown("""
         <div class="info-box">
-            <strong>ℹ️ How to use:</strong> Fill in the product and order details below to get an instant price prediction.
+            <strong>ℹ️ How to use:</strong> Change any value below and the prediction will update automatically in real-time!
         </div>
     """, unsafe_allow_html=True)
     
-    with st.form("prediction_form"):
-        col1, col2 = st.columns(2)
+    # Remove form wrapper for real-time updates
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### Product Information")
+        product_category = st.selectbox(
+            "Product Category",
+            categories['product_categories'],
+            help="Select the product category",
+            key="prod_cat"
+        )
         
-        with col1:
-            st.markdown("### Product Information")
-            product_category = st.selectbox(
-                "Product Category",
-                categories['product_categories'],
-                help="Select the product category"
-            )
-            
-            product_weight = st.number_input(
-                "Product Weight (g)",
-                min_value=1,
-                max_value=100000,
-                value=500,
-                help="Enter product weight in grams"
-            )
-            
-            product_length = st.number_input(
+        product_weight = st.number_input(
+            "Product Weight (g)",
+            min_value=1,
+            max_value=100000,
+            value=500,
+            step=100,
+            help="Enter product weight in grams",
+            key="prod_weight"
+        )
+        
+        product_length = st.number_input(
                 "Product Length (cm)",
                 min_value=1,
                 max_value=200,
                 value=20,
-                help="Enter product length in centimeters"
+                step=1,
+                help="Enter product length in centimeters",
+                key="prod_length"
             )
             
-            product_height = st.number_input(
-                "Product Height (cm)",
-                min_value=1,
-                max_value=200,
-                value=10,
-                help="Enter product height in centimeters"
-            )
-            
-            product_width = st.number_input(
-                "Product Width (cm)",
-                min_value=1,
-                max_value=200,
-                value=15,
-                help="Enter product width in centimeters"
-            )
-            
-            # NEW: Additional product fields matching notebook
-            product_description_lenght = st.number_input(
-                "Description Length (chars)",
-                min_value=0,
-                max_value=5000,
-                value=500,
-                help="Product description length in characters"
-            )
-            
-            product_photos_qty = st.number_input(
-                "Number of Photos",
-                min_value=0,
-                max_value=20,
-                value=1,
-                help="Number of product photos"
-            )
-            
-            product_name_lenght = st.number_input(
-                "Product Name Length (chars)",
-                min_value=0,
-                max_value=200,
-                value=50,
-                help="Product name length in characters"
-            )
+        product_height = st.number_input(
+            "Product Height (cm)",
+            min_value=1,
+            max_value=200,
+            value=10,
+            step=1,
+            help="Enter product height in centimeters",
+            key="prod_height"
+        )
         
-        with col2:
-            st.markdown("### Order Information")
-            payment_type = st.selectbox(
-                "Payment Type",
-                categories['payment_types'],
-                help="Select payment method"
-            )
-            
-            payment_installments = st.number_input(
-                "Payment Installments",
-                min_value=1,
-                max_value=24,
-                value=1,
-                help="Number of payment installments"
-            )
-            
-            payment_value = st.number_input(
-                "Payment Value (RM)",
-                min_value=0.0,
-                max_value=10000.0,
-                value=100.0,
-                help="Total payment value"
-            )
-            
-            order_status = st.selectbox(
-                "Order Status",
-                categories['order_statuses'],
-                help="Current order status"
-            )
+        product_width = st.number_input(
+            "Product Width (cm)",
+            min_value=1,
+            max_value=200,
+            value=15,
+            step=1,
+            help="Enter product width in centimeters",
+            key="prod_width"
+        )
         
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col2:
-            submit_button = st.form_submit_button("🔮 Predict Price", use_container_width=True)
+        # NEW: Additional product fields matching notebook
+        product_description_lenght = st.number_input(
+            "Description Length (chars)",
+            min_value=0,
+            max_value=5000,
+            value=500,
+            step=50,
+            help="Product description length in characters",
+            key="prod_desc"
+        )
         
-        if submit_button:
-            # Prepare input data with EXACT 13 columns matching notebook training
-            input_data = {
-                'payment_sequential': 1,
-                'payment_type': payment_type,
-                'payment_installments': payment_installments,
-                'payment_value': payment_value,
-                'order_status': order_status,
-                'product_weight_g': product_weight,
-                'product_length_cm': product_length,
-                'product_height_cm': product_height,
-                'product_width_cm': product_width,
-                'product_description_lenght': product_description_lenght,  # Note: typo matches notebook
-                'product_photos_qty': product_photos_qty,
-                'product_name_lenght': product_name_lenght,
-                'product_category_name_english': product_category
-            }
+        product_photos_qty = st.number_input(
+            "Number of Photos",
+            min_value=0,
+            max_value=20,
+            value=1,
+            step=1,
+            help="Number of product photos",
+            key="prod_photos"
+        )
+        
+        product_name_lenght = st.number_input(
+            "Product Name Length (chars)",
+            min_value=0,
+            max_value=200,
+            value=50,
+            step=5,
+            help="Product name length in characters",
+            key="prod_name"
+        )
+    
+    with col2:
+        st.markdown("### Order Information")
+        payment_type = st.selectbox(
+            "Payment Type",
+            categories['payment_types'],
+            help="Select payment method",
+            key="pay_type"
+        )
+        
+        payment_installments = st.number_input(
+            "Payment Installments",
+            min_value=1,
+            max_value=24,
+            value=1,
+            step=1,
+            help="Number of payment installments",
+            key="pay_install"
+        )
+        
+        payment_value = st.number_input(
+            "Payment Value (RM)",
+            min_value=0.0,
+            max_value=10000.0,
+            value=100.0,
+            step=10.0,
+            help="Total payment value",
+            key="pay_value"
+        )
+        
+        order_status = st.selectbox(
+            "Order Status",
+            categories['order_statuses'],
+            help="Current order status",
+            key="order_stat"
+        )
+    
+    # Auto-predict without button (real-time updates)
+    if True:  # Always predict
+        # Prepare input data with EXACT 13 columns matching notebook training
+        input_data = {
+            'payment_sequential': 1,
+            'payment_type': payment_type,
+            'payment_installments': payment_installments,
+            'payment_value': payment_value,
+            'order_status': order_status,
+            'product_weight_g': product_weight,
+            'product_length_cm': product_length,
+            'product_height_cm': product_height,
+            'product_width_cm': product_width,
+            'product_description_lenght': product_description_lenght,  # Note: typo matches notebook
+            'product_photos_qty': product_photos_qty,
+            'product_name_lenght': product_name_lenght,
+            'product_category_name_english': product_category
+        }
+        
+        # Show calculating indicator
+        with st.spinner('🔄 Calculating...'):
+            prediction = predict_price(model, preprocessor, feature_names, input_data)
+        
+        if prediction is not None:
+            # Get current timestamp
+            from datetime import datetime
+            timestamp = datetime.now().strftime('%H:%M:%S')
             
-            # Make prediction
-            with st.spinner('🔄 Calculating prediction...'):
-                prediction = predict_price(model, preprocessor, feature_names, input_data)
+            st.markdown("---")
+            st.markdown(f"""
+                <div class="prediction-result">
+                    <h2>💰 Predicted Price</h2>
+                    <h1>RM {prediction:.2f}</h1>
+                    <p>✅ Updated at {timestamp}</p>
+                </div>
+            """, unsafe_allow_html=True)
             
-            if prediction is not None:
-                st.markdown(f"""
-                    <div class="prediction-result">
-                        <h2>💰 Predicted Price</h2>
-                        <h1>RM {prediction:.2f}</h1>
-                        <p>Confidence: High ✅</p>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                # Additional insights
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Price Range (±10%)", f"RM {prediction*0.9:.2f} - RM {prediction*1.1:.2f}")
-                with col2:
-                    st.metric("Category Average", f"RM {payment_value:.2f}")
-                with col3:
-                    st.metric("Payment Installments", payment_installments)
+            # Show input summary to track what changed
+            st.info(f"""
+            **📋 Current Inputs:** 
+            Category: {product_category} | Weight: {product_weight}g | 
+            Dimensions: {product_length}×{product_width}×{product_height}cm | 
+            Description Length: {product_description_lenght} chars | 
+            Payment: RM {payment_value} ({payment_installments} installments)
+            """)
+            
+            # Additional insights
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Price Range (±10%)", f"RM {prediction*0.9:.2f} - RM {prediction*1.1:.2f}")
+            with col2:
+                st.metric("Payment Value Input", f"RM {payment_value:.2f}")
+            with col3:
+                st.metric("Payment Installments", payment_installments)
+            
+            # Explanation box
+            st.markdown("---")
+            st.warning("""
+            **💡 Why the price might stay the same:**
+            
+            Based on the model testing, only these inputs significantly affect the price:
+            - ✅ **Description Length** (0-5000 chars) - STRONGEST impact
+            - ✅ **Product Dimensions** (Length, Width, Height) - Medium impact
+            - ❌ Payment Value, Weight, Installments, Category - Minimal/No impact
+            
+            Try changing the **Description Length** or **Dimensions** to see bigger price changes!
+            """, icon="ℹ️")
 
 def csv_upload_form(model, preprocessor, feature_names):
     """CSV upload for batch predictions - 13 columns (NO LOCATION - global model)"""
