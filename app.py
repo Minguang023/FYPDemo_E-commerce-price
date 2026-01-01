@@ -252,32 +252,81 @@ def load_model():
 # Load category mappings
 @st.cache_data
 def load_categories():
+    # Category display names (user-friendly) mapped to model values (with underscores)
+    category_mapping = {
+        'Bed, Bath & Table': 'bed_bath_table',
+        'Health & Beauty': 'health_beauty',
+        'Sports & Leisure': 'sports_leisure',
+        'Furniture & Decor': 'furniture_decor',
+        'Computers & Accessories': 'computers_accessories',
+        'Housewares': 'housewares',
+        'Watches & Gifts': 'watches_gifts',
+        'Telephony': 'telephony',
+        'Garden Tools': 'garden_tools',
+        'Auto': 'auto',
+        'Toys': 'toys',
+        'Cool Stuff': 'cool_stuff',
+        'Luggage & Accessories': 'luggage_accessories',
+        'Perfumery': 'perfumery',
+        'Baby': 'baby',
+        'Fashion Bags & Accessories': 'fashion_bags_accessories',
+        'Pet Shop': 'pet_shop',
+        'Office Furniture': 'office_furniture',
+        'Market Place': 'market_place',
+        'Electronics': 'electronics',
+        'Home Appliances': 'home_appliances',
+        'Living Room Furniture': 'furniture_living_room',
+        'Construction Tools & Construction': 'construction_tools_construction',
+        'Bedroom Furniture': 'furniture_bedroom',
+        'Home Construction': 'home_construction',
+        'Musical Instruments': 'musical_instruments',
+        'Home Comfort': 'home_comfort',
+        'Consoles & Games': 'consoles_games',
+        'Audio': 'audio',
+        'Fashion Shoes': 'fashion_shoes',
+        'Computers': 'computers',
+        'Christmas Supplies': 'christmas_supplies',
+        'Books (General Interest)': 'books_general_interest',
+        'Construction Tools & Lights': 'construction_tools_lights',
+        'Industry, Commerce & Business': 'industry_commerce_and_business',
+        'Food': 'food',
+        'Art': 'art',
+        'Furniture, Mattress & Upholstery': 'furniture_mattress_and_upholstery',
+        'Party Supplies': 'party_supplies',
+        'Fashion Children\'s Clothes': 'fashion_childrens_clothes',
+        'Stationery': 'stationery',
+        'Tablets, Printing & Image': 'tablets_printing_image',
+        'Construction Tools': 'construction_tools_tools',
+        'Fashion Male Clothing': 'fashion_male_clothing',
+        'Books (Technical)': 'books_technical',
+        'Drinks': 'drinks',
+        'Kitchen, Dining, Laundry & Garden Furniture': 'kitchen_dining_laundry_garden_furniture',
+        'Flowers': 'flowers',
+        'Air Conditioning': 'air_conditioning',
+        'Construction Tools & Safety': 'construction_tools_safety',
+        'Fashion Underwear & Beach': 'fashion_underwear_beach',
+        'Fashion Sport': 'fashion_sport',
+        'Food & Drink': 'food_drink',
+        'Home Appliances 2': 'home_appliances_2',
+        'Agro Industry & Commerce': 'agro_industry_and_commerce',
+        'La Cuisine': 'la_cuisine',
+        'Signaling & Security': 'signaling_and_security',
+        'Arts & Craftmanship': 'arts_and_craftmanship',
+        'Fashion Female Clothing': 'fashion_female_clothing',
+        'Small Appliances': 'small_appliances',
+        'DVDs & Blu-Ray': 'dvds_blu_ray',
+        'CDs, DVDs & Musicals': 'cds_dvds_musicals',
+        'Diapers & Hygiene': 'diapers_and_hygiene',
+        'Small Appliances (Oven & Coffee)': 'small_appliances_home_oven_and_coffee',
+        'Health & Beauty 2': 'health_beauty_2',
+        'Computers & Accessories 2': 'computers_accessories_2'
+    }
+    
     return {
         'payment_types': ['credit_card', 'boleto', 'voucher', 'debit_card'],
         'order_statuses': ['delivered', 'shipped', 'approved', 'invoiced'],
-        'product_categories': [
-            'bed_bath_table', 'health_beauty', 'sports_leisure', 'furniture_decor',
-            'computers_accessories', 'housewares', 'watches_gifts', 'telephony',
-            'garden_tools', 'auto', 'toys', 'cool_stuff', 'luggage_accessories',
-            'perfumery', 'baby', 'fashion_bags_accessories', 'pet_shop',
-            'office_furniture', 'market_place', 'electronics', 'home_appliances',
-            'furniture_living_room', 'construction_tools_construction',
-            'furniture_bedroom', 'home_construction', 'musical_instruments',
-            'home_comfort', 'consoles_games', 'audio', 'fashion_shoes',
-            'computers', 'christmas_supplies', 'books_general_interest',
-            'construction_tools_lights', 'industry_commerce_and_business',
-            'food', 'art', 'furniture_mattress_and_upholstery', 'party_supplies',
-            'fashion_childrens_clothes', 'stationery', 'tablets_printing_image',
-            'construction_tools_tools', 'fashion_male_clothing', 'books_technical',
-            'drinks', 'kitchen_dining_laundry_garden_furniture', 'flowers',
-            'air_conditioning', 'construction_tools_safety', 'fashion_underwear_beach',
-            'fashion_sport', 'food_drink', 'home_appliances_2', 'agro_industry_and_commerce',
-            'la_cuisine', 'signaling_and_security', 'arts_and_craftmanship',
-            'fashion_female_clothing', 'small_appliances', 'dvds_blu_ray',
-            'cds_dvds_musicals', 'diapers_and_hygiene', 'small_appliances_home_oven_and_coffee',
-            'health_beauty_2', 'computers_accessories_2'
-        ]
-        # Removed 'states' - no location data in global model
+        'category_mapping': category_mapping,
+        'product_categories': list(category_mapping.values())  # Model values
     }
 
 def create_dashboard():
@@ -515,11 +564,16 @@ def manual_input_form(model, preprocessor, feature_names, categories):
         
         with col1:
             st.markdown("### Product Information")
-            product_category = st.selectbox(
+            
+            # Use friendly display names but send model values
+            category_display = st.selectbox(
                 "Product Category",
-                categories['product_categories'],
+                options=list(categories['category_mapping'].keys()),
                 help="Select the product category"
             )
+            # Convert display name to model value
+            product_category = categories['category_mapping'][category_display]
+            
             
             product_weight = st.number_input(
                 "Product Weight (g)",
@@ -644,15 +698,16 @@ def manual_input_form(model, preprocessor, feature_names, categories):
                 """, unsafe_allow_html=True)
                 
                 # Additional insights
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Price Range (±10%)", f"RM {prediction*0.9:.2f} - RM {prediction*1.1:.2f}")
+                col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
-                    st.metric("Category Average", f"RM {payment_value:.2f}")
-                with col3:
-                    st.metric("Payment Installments", payment_installments)
+                    st.markdown(f"""
+                        <div style="text-align: center; padding: 1rem;">
+                            <h3 style="color: #c9d1d9; margin-bottom: 0.5rem;">Price Range (±10%)</h3>
+                            <h2 style="color: #58a6ff; font-size: 1.5rem;">RM {prediction*0.9:.2f} - RM {prediction*1.1:.2f}</h2>
+                        </div>
+                    """, unsafe_allow_html=True)
 
-def csv_upload_form(model, preprocessor, feature_names):
+def csv_upload_form(model, preprocessor, feature_names, categories):
     """CSV upload for batch predictions - 13 columns (NO LOCATION - global model)"""
     st.markdown("## 📂 CSV Upload Prediction")
     
@@ -701,6 +756,36 @@ def csv_upload_form(model, preprocessor, feature_names):
             mime="text/csv",
             use_container_width=True
         )
+    
+    # Display available category names
+    st.markdown("---")
+    st.markdown("### 📋 Available Product Categories")
+    st.info("**Copy and paste these exact category names into your CSV file's `product_category_name_english` column.**")
+    
+    # Get categories and display in 4 columns
+    category_list = categories['product_categories']
+    col1, col2, col3, col4 = st.columns(4)
+    
+    # Split categories into 4 groups
+    chunk_size = (len(category_list) + 3) // 4  # Divide into 4 parts
+    
+    with col1:
+        for cat in category_list[:chunk_size]:
+            st.markdown(f"• `{cat}`")
+    
+    with col2:
+        for cat in category_list[chunk_size:chunk_size*2]:
+            st.markdown(f"• `{cat}`")
+    
+    with col3:
+        for cat in category_list[chunk_size*2:chunk_size*3]:
+            st.markdown(f"• `{cat}`")
+    
+    with col4:
+        for cat in category_list[chunk_size*3:]:
+            st.markdown(f"• `{cat}`")
+    
+    st.markdown("---")
     
     # File upload
     uploaded_file = st.file_uploader(
@@ -776,7 +861,6 @@ def main():
     st.markdown("""
         <h1>🛒 E-Commerce Price Prediction System</h1>
         <p style='text-align: center; color: #666; font-size: 1.1rem;'>
-            Powered by Machine Learning | Random Forest Model
         </p>
     """, unsafe_allow_html=True)
     
@@ -840,7 +924,7 @@ def main():
     elif page == "📝 Manual Prediction":
         manual_input_form(model, preprocessor, feature_names, categories)
     else:
-        csv_upload_form(model, preprocessor, feature_names)
+        csv_upload_form(model, preprocessor, feature_names, categories)
 
 if __name__ == "__main__":
     main()
