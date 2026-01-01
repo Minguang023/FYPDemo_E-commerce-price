@@ -765,7 +765,7 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
     # Display available category names
     st.markdown("---")
     st.markdown("### 📋 Available Product Categories")
-    st.info("**Copy and paste these exact category names into your CSV file's `product_category_name_english` column.**")
+    st.info("**Copy and paste these exact category names into your CSV file's `product_category_name_english` column for accurate predictions.**")
     
     # Get categories and display in 4 columns
     category_list = categories['product_categories']
