@@ -531,12 +531,17 @@ def predict_price(model, preprocessor, feature_names, input_data):
         prediction = model.predict(X_final_df)
         
         # Store prediction in session state for dashboard tracking
+        # Get Malaysia time (GMT+8)
+        from datetime import datetime, timezone, timedelta
+        malaysia_tz = timezone(timedelta(hours=8))
+        malaysia_time = datetime.now(malaysia_tz)
+        
         prediction_record = {
             'predicted_price': float(prediction[0]),
             'category': original_category,
             'payment_type': original_payment,
             'payment_value': float(input_data.get('payment_value', 0)),
-            'timestamp': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
+            'timestamp (GMT +8)': malaysia_time.strftime('%Y-%m-%d %H:%M:%S')
         }
         
         st.session_state.predictions_history.append(prediction_record)
