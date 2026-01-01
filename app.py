@@ -22,32 +22,77 @@ if 'predictions_history' not in st.session_state:
 if 'total_predictions' not in st.session_state:
     st.session_state.total_predictions = 0
 
-# Custom CSS for better UI
+# Custom CSS for dark theme
 st.markdown("""
     <style>
+    /* Force dark theme */
+    .stApp {
+        background-color: #0e1117;
+        color: #fafafa;
+    }
+    
+    /* Sidebar dark */
+    [data-testid="stSidebar"] {
+        background-color: #262730;
+    }
+    
     .main {
         padding: 0rem 1rem;
+        background-color: #0e1117;
     }
+    
     .stAlert {
         margin-top: 1rem;
     }
+    
     h1 {
-        color: #1f77b4;
+        color: #58a6ff;
         text-align: center;
         padding: 1.5rem 0;
     }
+    
     h2 {
-        color: #2c3e50;
-        border-bottom: 2px solid #1f77b4;
+        color: #58a6ff;
+        border-bottom: 2px solid #58a6ff;
         padding-bottom: 0.5rem;
     }
+    
+    h3 {
+        color: #79c0ff;
+    }
+    
     .metric-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 1.5rem;
         border-radius: 10px;
         color: white;
         margin: 0.5rem 0;
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
+    
+    .metric-card h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        color: white !important;
+    }
+    
+    .metric-card h2 {
+        font-size: 2rem;
+        margin: 0.5rem 0;
+        border-bottom: none !important;
+        color: white !important;
+    }
+    
+    .metric-card p {
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        opacity: 0.9;
+        color: white !important;
+    }
+    
     .prediction-result {
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         padding: 2rem;
@@ -57,12 +102,33 @@ st.markdown("""
         font-size: 1.5rem;
         margin: 1rem 0;
     }
+    
     .info-box {
-        background-color: #e3f2fd;
+        background-color: #1c2128;
         padding: 1rem;
         border-radius: 10px;
-        border-left: 5px solid #1f77b4;
+        border-left: 5px solid #58a6ff;
         margin: 1rem 0;
+        color: #c9d1d9;
+    }
+    
+    /* Text colors for dark theme */
+    p, span, div, label {
+        color: #c9d1d9 !important;
+    }
+    
+    /* Input fields dark */
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div {
+        background-color: #1c2128;
+        color: #c9d1d9;
+        border-color: #30363d;
+    }
+    
+    /* Metrics styling */
+    [data-testid="stMetricValue"] {
+        color: #58a6ff;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -618,11 +684,18 @@ def csv_upload_form(model, preprocessor, feature_names):
     col1, col2 = st.columns([3, 1])
     with col1:
         st.markdown("### Required Columns (13 total - NO LOCATION):")
-        st.code(", ".join(sample_data.keys()), language="text")
+        # Display as bullet points for better readability
+        columns_list = list(sample_data.keys())
+        st.markdown("**Payment Information:**")
+        st.markdown("- `payment_sequential`\n- `payment_type`\n- `payment_installments`\n- `payment_value`\n- `order_status`")
+        st.markdown("**Product Dimensions:**")
+        st.markdown("- `product_weight_g`\n- `product_length_cm`\n- `product_height_cm`\n- `product_width_cm`")
+        st.markdown("**Product Details:**")
+        st.markdown("- `product_description_lenght`\n- `product_photos_qty`\n- `product_name_lenght`\n- `product_category_name_english`")
     with col2:
         csv = sample_df.to_csv(index=False)
         st.download_button(
-            label="📥 Download Template",
+            label="📥 Download CSV Template",
             data=csv,
             file_name="price_prediction_template.csv",
             mime="text/csv",
@@ -732,39 +805,33 @@ def main():
         st.info("""
             **Model:** Random Forest Regressor
             
-            **Dataset:** Brazilian E-Commerce (Global)
+            **Dataset:** Brazilian E-Commerce Public Dataset by Olist (Source by Kaggle)
             
             **Performance:**
-            - R² Score: 0.8202 (82%)
+            - R² Score: 0.8202 (82% Accuracy)
             - RMSE: 30.76
             - MAE: 15.64
-            
-            **Features:** 13 input → 92 encoded → 10 selected
-            
-            **Note:** No location data - works globally!
+            - MAPE: 21.33%
+                
         """)
         
         st.markdown("---")
         st.markdown("### 👨‍🎓 About")
         st.markdown("""
-            This is a Final Year Project (FYP) for predicting e-commerce product prices 
-            using machine learning techniques.
+            **Developed by:** Loi Min Guang (TP065267)
             
-            **Developed by:** Loi Min Guang
+            **Project Title:** E-Commerce Price Prediction System
+                    
+            **Project Aim:** To develop and evaluate a comprehensive machine learning framework for dynamic pricing optimization in e-commerce that maximizes predictive accuracy while generating price recommendations for online retailers.
             
-            **Year:** 2025
-            
-            **Model:** Random Forest Regressor (Best Performance)
+            **Model:** Random Forest Regressor
             
             **Performance Metrics:**
-            - R² Score: 0.8202 (82.02% accuracy)
+            - R² Score: 0.8202 (82.02% Accuracy)
             - RMSE: 30.76
             - MAE: 15.64
             - MAPE: 21.34%
             
-            **Training Dataset:** Brazilian E-Commerce Dataset
-            
-            **Features:** 13 input → 92 encoded → 10 selected features for prediction.
         """)
     
     # Main content
