@@ -1297,6 +1297,12 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
                     # Trim history to prevent memory issues
                     trim_prediction_history()
                     
+                    # Calculate summary stats BEFORE adding to dataframe
+                    num_products = len(predictions)
+                    avg_price = np.mean(predictions)
+                    max_price = np.max(predictions)
+                    total_value = np.sum(predictions)
+                    
                     # Add predictions to dataframe
                     df['Predicted_Price_RM'] = [f"{p:.2f}" for p in predictions]
                     df['Price_Min_RM'] = [f"{p*0.9:.2f}" for p in predictions]
@@ -1308,17 +1314,17 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
                     
                     st.success("✅ Batch predictions completed successfully!")
                     
-                    # Business metrics
+                    # Business metrics (using saved stats)
                     st.markdown("### 💼 Business Summary")
                     col1, col2, col3, col4 = st.columns(4)
                     with col1:
-                        st.metric("📦 Products Analyzed", len(predictions))
+                        st.metric("📦 Products Analyzed", num_products)
                     with col2:
-                        st.metric("💰 Average Price", f"RM {np.mean(predictions):.2f}")
+                        st.metric("💰 Average Price", f"RM {avg_price:.2f}")
                     with col3:
-                        st.metric("📈 Highest Price", f"RM {np.max(predictions):.2f}")
+                        st.metric("📈 Highest Price", f"RM {max_price:.2f}")
                     with col4:
-                        st.metric("💵 Total Inventory Value", f"RM {np.sum(predictions):,.2f}")
+                        st.metric("💵 Total Inventory Value", f"RM {total_value:,.2f}")
                     
                     # Display results
                     st.markdown("### 📊 Detailed Results")
