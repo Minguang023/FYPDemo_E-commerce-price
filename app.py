@@ -608,9 +608,11 @@ def generate_report():
             border-radius: 10px;
             padding: 1.5rem;
             margin: 1rem 0;
-            min-height: 200px;
+            min-height: 220px;
+            height: 100%;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
         }
         .category-item {
             background: #161b22;
@@ -1368,4 +1370,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
