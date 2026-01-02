@@ -146,7 +146,7 @@ def download_model_from_drive():
         st.info("📥 Downloading model from Google Drive... (first time only)")
         
         # Google Drive file ID
-        file_id = "1Ng-HmnGWzCDh-7J_ZE0Djs2UcZi97-Tr"
+        file_id = "1x619bwFCEdxtJdGxXqeo1hiUpvVU-pf3"
         url = f"https://drive.google.com/uc?id={file_id}"
         
         try:
@@ -1368,3 +1368,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
