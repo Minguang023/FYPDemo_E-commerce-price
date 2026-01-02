@@ -7,6 +7,8 @@ import plotly.graph_objects as go
 from datetime import datetime
 import os
 import gdown
+import gc  # Garbage collector for memory management
+
 
 # Page configuration
 st.set_page_config(
@@ -16,6 +18,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Maximum predictions to keep in memory (prevent crashes)
+MAX_HISTORY_SIZE = 500
+
 # Initialize session state for tracking predictions
 if 'predictions_history' not in st.session_state:
     st.session_state.predictions_history = []
@@ -23,6 +28,14 @@ if 'total_predictions' not in st.session_state:
     st.session_state.total_predictions = 0
 if 'show_report' not in st.session_state:
     st.session_state.show_report = False
+
+def trim_prediction_history():
+    """Keep only the latest predictions to prevent memory issues"""
+    if len(st.session_state.predictions_history) > MAX_HISTORY_SIZE:
+        # Keep only the most recent predictions
+        st.session_state.predictions_history = st.session_state.predictions_history[-MAX_HISTORY_SIZE:]
+        # Force garbage collection to free memory
+        gc.collect()
 
 # Custom CSS for professional dark theme
 st.markdown("""
@@ -138,29 +151,30 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+@st.cache_resource(show_spinner=False)
 def download_model_from_drive():
-    """Download model from Google Drive if not present"""
+    """Download model from Google Drive if not present - Cached to prevent re-downloads"""
     model_path = 'tuned_random_forest_model.pkl'
     
     if not os.path.exists(model_path):
-        st.info("📥 Downloading model from Google Drive... (first time only)")
-        
         # Google Drive file ID
         file_id = "1x619bwFCEdxtJdGxXqeo1hiUpvVU-pf3"
         url = f"https://drive.google.com/uc?id={file_id}"
         
         try:
-            gdown.download(url, model_path, quiet=False)
-            st.success("✅ Model downloaded successfully!")
+            # Download with timeout to prevent hanging
+            gdown.download(url, model_path, quiet=False, fuzzy=True)
             return model_path
         except Exception as e:
             st.error(f"❌ Error downloading model: {e}")
+            st.error("Please check your internet connection and try refreshing the page.")
             return None
     
     return model_path
 
+@st.cache_resource(show_spinner=False)
 def load_model():
-    """Load the trained model, preprocessor, and selected features"""
+    """Load the trained model, preprocessor, and selected features - Cached for performance"""
     try:
         # Download model if needed
         model_path = download_model_from_drive()
@@ -179,6 +193,7 @@ def load_model():
         
     except Exception as e:
         st.error(f"Error loading model: {e}")
+        st.error("Please refresh the page to retry loading the model.")
         return None, None, None
 
 def load_categories():
@@ -259,6 +274,10 @@ def create_dashboard():
     
     # Get prediction history from session state
     predictions = st.session_state.predictions_history
+    
+    # Memory status indicator
+    if len(predictions) > 400:
+        st.info(f"ℹ️ History contains {len(predictions)} predictions. Older predictions will be automatically removed at {MAX_HISTORY_SIZE} to maintain performance.")
     
     # Check if we have any predictions
     if len(predictions) == 0:
@@ -1037,6 +1056,9 @@ def manual_input_form(model, preprocessor, feature_names, categories):
                 })
                 st.session_state.total_predictions += 1
                 
+                # Trim history to prevent memory issues
+                trim_prediction_history()
+                
                 # Display result
                 st.markdown(f"""
                     <div class="prediction-result">
@@ -1188,6 +1210,10 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
             
             st.success(f"✅ File uploaded successfully! Found {len(df)} products.")
             
+            # Warning for large datasets
+            if len(df) > 100:
+                st.warning(f"⚠️ Large dataset detected ({len(df)} products). Processing may take a few minutes.")
+            
             # Show preview
             with st.expander("📋 Preview Data (First 10 Rows)"):
                 st.dataframe(df.head(10), use_container_width=True)
@@ -1259,14 +1285,26 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
                         
                         progress_bar.progress((idx + 1) / len(df))
                         status_text.text(f"Processing: {idx + 1}/{len(df)} products...")
+                        
+                        # Periodic garbage collection for large batches
+                        if (idx + 1) % 50 == 0:
+                            gc.collect()
                     
                     status_text.empty()
+                    progress_bar.empty()
                     st.session_state.total_predictions += len(predictions)
+                    
+                    # Trim history to prevent memory issues
+                    trim_prediction_history()
                     
                     # Add predictions to dataframe
                     df['Predicted_Price_RM'] = [f"{p:.2f}" for p in predictions]
                     df['Price_Min_RM'] = [f"{p*0.9:.2f}" for p in predictions]
                     df['Price_Max_RM'] = [f"{p*1.1:.2f}" for p in predictions]
+                    
+                    # Clear predictions list to free memory
+                    del predictions
+                    gc.collect()
                     
                     st.success("✅ Batch predictions completed successfully!")
                     
@@ -1311,13 +1349,17 @@ def main():
         </p>
     """, unsafe_allow_html=True)
     
-    # Load model
-    model, preprocessor, feature_names = load_model()
-    categories = load_categories()
+    # Show loading state for Streamlit Cloud health checks
+    with st.spinner('🔄 Loading AI model... Please wait...'):
+        # Load model with caching
+        model, preprocessor, feature_names = load_model()
+        categories = load_categories()
     
     # Model and preprocessor are required
     if model is None or preprocessor is None:
-        st.error("❌ Failed to load model. Please check the error messages above.")
+        st.error("❌ Failed to load model. Please refresh the page to retry.")
+        st.info("💡 If the problem persists, the model file may need to be re-uploaded to Google Drive.")
+        st.stop()
         return
     
     # Sidebar
