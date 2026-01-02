@@ -147,7 +147,7 @@ def download_model_from_drive():
     url = f'https://drive.google.com/uc?id={file_id}'
     
     try:
-        st.info("⏳ Downloading model from Google Drive... (this may take a minute)")
+        st.info("⏳ Loading Random Forest Regressor model from Google Drive... (this may take a minute)")
         # Use fuzzy=True to handle Google Drive download page
         output = gdown.download(url, model_path, quiet=False, fuzzy=True)
         
@@ -896,7 +896,7 @@ def main():
             
             **Dataset:** Brazilian E-Commerce Public Dataset by Olist (Source by Kaggle)
             
-            **Performance:**
+            **Performance Metrics:**
             - R² Score: 0.8202 (82% Accuracy)
             - RMSE: 30.76
             - MAE: 15.64
@@ -912,15 +912,7 @@ def main():
             **Project Title:** E-Commerce Price Prediction System
                     
             **Project Aim:** To develop and evaluate a comprehensive machine learning framework for dynamic pricing optimization in e-commerce that maximizes predictive accuracy while generating price recommendations for online retailers.
-            
-            **Model:** Random Forest Regressor
-            
-            **Performance Metrics:**
-            - R² Score: 0.8202 (82.02% Accuracy)
-            - RMSE: 30.76
-            - MAE: 15.64
-            - MAPE: 21.34%
-            
+                    
         """)
     
     # Main content
