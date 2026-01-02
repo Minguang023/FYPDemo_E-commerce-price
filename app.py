@@ -650,7 +650,7 @@ def manual_input_form(model, preprocessor, feature_names, categories):
                 min_value=1,
                 max_value=24,
                 value=1,
-                help="Number of payment installments"
+                help="Number of payment installments (Months)"
             )
             
             payment_value = st.number_input(
