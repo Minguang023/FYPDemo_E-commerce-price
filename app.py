@@ -483,7 +483,7 @@ def create_dashboard():
     
     with col1:
         st.markdown("""
-        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem; border-radius: 8px;'>
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem; border-radius: 8px; min-height: 150px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>
             <h4 style='color: white; margin: 0;'>🎯 Optimize Pricing</h4>
             <p style='color: white; font-size: 0.9rem; margin-top: 0.5rem;'>
             Products with width > 50cm tend to have higher prices. Consider this in your pricing strategy.
@@ -493,7 +493,7 @@ def create_dashboard():
     
     with col2:
         st.markdown(f"""
-        <div style='background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 1rem; border-radius: 8px;'>
+        <div style='background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 1rem; border-radius: 8px; min-height: 150px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>
             <h4 style='color: white; margin: 0;'>📊 Market Position</h4>
             <p style='color: white; font-size: 0.9rem; margin-top: 0.5rem;'>
             Your average price (RM {avg_price:.2f}) is {'above' if avg_price > median_price else 'below'} the median (RM {median_price:.2f}).
@@ -509,7 +509,7 @@ def create_dashboard():
             top_category = 'N/A'
         
         st.markdown(f"""
-        <div style='background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 1rem; border-radius: 8px;'>
+        <div style='background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 1rem; border-radius: 8px; min-height: 150px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>
             <h4 style='color: white; margin: 0;'>🏆 Focus Area</h4>
             <p style='color: white; font-size: 0.9rem; margin-top: 0.5rem;'>
             Most analyzed category: <strong>{top_category}</strong>. Consider expanding this category.
