@@ -12,7 +12,7 @@ import gc  # Garbage collector for memory management
 
 # Page configuration
 st.set_page_config(
-    page_title="SmartPrice AI - E-Commerce Price Predictor",
+    page_title="SmartPricing AI - E-Commerce Price Prediction System",
     page_icon="🛒",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -284,35 +284,19 @@ def create_dashboard():
         st.info("📝 **Get Started:** Make predictions below to see real-time analytics, pricing insights, and business intelligence.")
         
         # Show guide instead of empty metrics
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("""
-                <div class="metric-card">
-                    <h3>🎯 How It Works</h3>
-                    <p style='font-size: 0.95rem; line-height: 1.6;'>
-                    <strong>1. Enter Product Details</strong><br/>
-                    Fill in 7 simple fields: name, category, dimensions, weight, and description length.<br/><br/>
-                    <strong>2. Get AI Prediction</strong><br/>
-                    Our Random Forest model (82% accuracy) predicts the optimal price.<br/><br/>
-                    <strong>3. View Analytics</strong><br/>
-                    Dashboard updates with pricing insights, trends, and recommendations.
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
-        with col2:
-            st.markdown("""
-                <div class="metric-card">
-                    <h3>💡 Why This Matters</h3>
-                    <p style='font-size: 0.95rem; line-height: 1.6;'>
-                    <strong>Data-Driven Pricing</strong><br/>
-                    Based on 85,756 real Brazilian e-commerce transactions.<br/><br/>
-                    <strong>Key Factors</strong><br/>
-                    Width (+RM 105), Description (+RM 52) have major impact on price.<br/><br/>
-                    <strong>Business Value</strong><br/>
-                    Optimize pricing strategy, compare products, analyze market trends.
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
+        st.markdown("""
+            <div class="metric-card">
+                <h3>🎯 How It Works</h3>
+                <p style='font-size: 0.95rem; line-height: 1.6;'>
+                <strong>1. Enter Product Details</strong><br/>
+                Fill in 7 simple fields: name, category, dimensions, weight, and description length.<br/><br/>
+                <strong>2. Get AI Prediction</strong><br/>
+                Our Random Forest model (82% accuracy) predicts the optimal price.<br/><br/>
+                <strong>3. View Analytics</strong><br/>
+                Dashboard updates with pricing insights, trends, and recommendations.
+                </p>
+            </div>
+        """, unsafe_allow_html=True)
         return
     
     # Convert predictions to DataFrame for analysis
@@ -444,7 +428,8 @@ def create_dashboard():
             fill='tozeroy',
             fillcolor='rgba(163, 113, 247, 0.3)',
             name='Price Trend',
-            hovertemplate='Product #%{x}<br>Price: RM %{y:.2f}<extra></extra>'
+            customdata=price_trend_df['product_name'],
+            hovertemplate='%{customdata}<br>Price: RM %{y:.2f}<extra></extra>'
         ))
         
         # Add average line
@@ -487,8 +472,8 @@ def create_dashboard():
     
     # Show last 10 predictions with product names and friendly category names
     recent_df = df.tail(10).copy()
-    recent_df = recent_df[['timestamp', 'product_name', 'category_display', 'width', 'description_length', 'predicted_price']]
-    recent_df.columns = ['Timestamp', 'Product Name', 'Category', 'Width (cm)', 'Description Length', 'Predicted Price (RM)']
+    recent_df = recent_df[['timestamp', 'product_name', 'category_display', 'predicted_price']]
+    recent_df.columns = ['Timestamp', 'Product Name', 'Category', 'Predicted Price (RM)']
     recent_df['Predicted Price (RM)'] = recent_df['Predicted Price (RM)'].apply(lambda x: f"RM {x:.2f}")
     recent_df = recent_df.sort_values('Timestamp', ascending=False)
     
@@ -831,8 +816,8 @@ def generate_report():
     """, unsafe_allow_html=True)
     
     recent_df = df.tail(10).sort_values('timestamp', ascending=False)
-    recent_df_display = recent_df[['product_name', 'category_display', 'predicted_price', 'width', 'description_length']].copy()
-    recent_df_display.columns = ['Product', 'Category', 'Price (RM)', 'Width (cm)', 'Description Length']
+    recent_df_display = recent_df[['product_name', 'category_display', 'predicted_price']].copy()
+    recent_df_display.columns = ['Product', 'Category', 'Price (RM)']
     recent_df_display['Price (RM)'] = recent_df_display['Price (RM)'].apply(lambda x: f"RM {x:.2f}")
     
     st.dataframe(recent_df_display, use_container_width=True, hide_index=True)
@@ -843,9 +828,8 @@ def generate_report():
             <h3 style='color: #58a6ff; margin-top: 0;'>📚 METHODOLOGY</h3>
             <p style='color: #c9d1d9; line-height: 1.8;'>
                 <strong>Model:</strong> Random Forest Regressor (scikit-learn)<br>
-                <strong>Dataset:</strong> 85,756 products from Brazilian E-Commerce (Olist/Kaggle)<br>
+                <strong>Dataset:</strong> Brazilian E-Commerce Public Dataset by Olist (Sourced by Kaggle<br>
                 <strong>Performance:</strong> R² = 0.8202 (82% accuracy) | MAE: RM 15.64 | RMSE: RM 30.76<br>
-                <strong>Features:</strong> 13 input columns → 92 encoded features → 10 selected features
             </p>
             <p style='color: #8b949e; font-size: 0.9rem; margin-top: 1.5rem; font-style: italic;'>
                 Disclaimer: This report uses AI/ML predictions based on historical data. Actual market prices may 
@@ -905,18 +889,18 @@ def predict_price(model, preprocessor, feature_names, input_data):
         return None
 
 def manual_input_form(model, preprocessor, feature_names, categories):
-    """Simplified manual input form - 7 fields (6 predictions + product name)"""
+    """Input form - 7 fields for price prediction"""
     st.markdown("## 🛍️ Quick Price Prediction")
-    st.markdown("<p style='color: #8b949e; margin-bottom: 1rem;'>Get instant AI-powered price predictions in seconds</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #8b949e; margin-bottom: 1rem;'>Get instant machine learning based price predictions in seconds</p>", unsafe_allow_html=True)
     
     st.markdown("""
         <div class="info-box">
-            <strong>ℹ️ Simple & Fast:</strong> Enter just 7 product details to get an AI-powered price prediction in seconds.
+            <strong>ℹ️ Simple & Fast:</strong> Enter just 7 product details to get a machine learning based price prediction in seconds.
         </div>
     """, unsafe_allow_html=True)
     
     with st.form("prediction_form"):
-        # Product Name (for display only, not used in prediction)
+        # Product Name 
         st.markdown("### 📝 Product Identification")
         st.markdown("<div style='margin-bottom: 1rem;'></div>", unsafe_allow_html=True)
         
@@ -925,7 +909,7 @@ def manual_input_form(model, preprocessor, feature_names, categories):
             value="",
             max_chars=100,
             placeholder="e.g., Samsung Galaxy Phone, Office Chair, etc.",
-            help="Enter a descriptive name for tracking (not used in price prediction)"
+            help="Name of your product"
         )
         
         st.markdown("<div style='margin: 2rem 0 1rem 0;'></div>", unsafe_allow_html=True)
@@ -1349,9 +1333,9 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
 def main():
     # Header
     st.markdown("""
-        <h1>🛒 SmartPrice AI - E-Commerce Price Predictor</h1>
+        <h1>🛒 SmartPricing AI - E-Commerce Price Prediction System</h1>
         <p style='text-align: center; color: #8b949e; font-size: 1.1rem;'>
-        Intelligent pricing powered by Machine Learning | 82% Accuracy | 85,756 Products Analyzed
+        Intelligent pricing predictor powered by Machine Learning | Based on Random Forest Model up to 82% Accuracy
         </p>
     """, unsafe_allow_html=True)
     
@@ -1403,7 +1387,7 @@ def main():
             
             **Project:** E-Commerce Price Prediction System
             
-            **Aim:** Develop ML framework for dynamic pricing optimization that maximizes predictive accuracy and generates actionable price recommendations for online retailers.
+            **Aim:** To develop and evaluate a comprehensive machine learning framework for dynamic pricing optimization in e-commerce that maximizes predictive accuracy while generating price recommendations for online retailers.
         """)
     
     # Main content
