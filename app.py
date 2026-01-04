@@ -4,10 +4,13 @@ import numpy as np
 import joblib
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import os
 import gdown
 import gc  # Garbage collector for memory management
+
+# Malaysia timezone (GMT+8)
+MALAYSIA_TZ = timezone(timedelta(hours=8))
 
 
 # Page configuration
@@ -816,8 +819,8 @@ def generate_report():
     """, unsafe_allow_html=True)
     
     recent_df = df.tail(10).sort_values('timestamp', ascending=False)
-    recent_df_display = recent_df[['product_name', 'category_display', 'predicted_price']].copy()
-    recent_df_display.columns = ['Product', 'Category', 'Price (RM)']
+    recent_df_display = recent_df[['timestamp', 'product_name', 'category_display', 'predicted_price']].copy()
+    recent_df_display.columns = ['Timestamp', 'Product', 'Category', 'Price (RM)']
     recent_df_display['Price (RM)'] = recent_df_display['Price (RM)'].apply(lambda x: f"RM {x:.2f}")
     
     st.dataframe(recent_df_display, use_container_width=True, hide_index=True)
@@ -1028,7 +1031,7 @@ def manual_input_form(model, preprocessor, feature_names, categories):
             if prediction is not None:
                 # Store prediction in history with product name and all dimensions
                 st.session_state.predictions_history.append({
-                    'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'timestamp': datetime.now(MALAYSIA_TZ).strftime('%Y-%m-%d %H:%M:%S'),
                     'product_name': product_name,
                     'category': product_category,
                     'length': product_length,
@@ -1117,9 +1120,6 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
         5. `product_height_cm` - Height in centimeters
         6. `product_width_cm` - Width in centimeters
         7. `product_description_lenght` - Description length in characters
-        
-        ⚡ **Automatic Defaults** (hidden, zero impact on predictions):
-        - order_status, payment_sequential, payment_type, payment_installments, payment_value, product_photos_qty, product_name_lenght
         """)
     with col2:
         csv = sample_df.to_csv(index=False)
@@ -1256,7 +1256,7 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
                         
                         # Store in session history with all required fields for report
                         st.session_state.predictions_history.append({
-                            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                            'timestamp': datetime.now(MALAYSIA_TZ).strftime('%Y-%m-%d %H:%M:%S'),
                             'product_name': row['product_name'],
                             'category': category_value,
                             'length': row['product_length_cm'],
