@@ -1110,7 +1110,7 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
     
     col1, col2 = st.columns([3, 1])
     with col1:
-        st.markdown("### 📋 Required Columns (7 Total - Simplified!)")
+        st.markdown("### 📋 Required Columns ")
         st.markdown("""
         **User Input Fields:**
         1. `product_name` - Product name for tracking (not used in prediction)
