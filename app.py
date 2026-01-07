@@ -261,7 +261,7 @@ def load_categories():
         'Computers & Accessories 2': 'computers_accessories_2'
     }
     
-    # Create reverse mapping (ID -> Friendly Name)
+    # Create reverse mapping (ID to Normal Category Name)
     reverse_mapping = {v: k for k, v in category_mapping.items()}
     
     return {
@@ -375,11 +375,11 @@ def create_dashboard():
         if 'category' in df.columns:
             st.markdown("#### 🏆 Top Product Categories")
             
-            # Get categories and convert to friendly names
+            # Get categories and convert to actual category names
             categories = load_categories()
             reverse_mapping = categories['reverse_mapping']
             
-            # Map category IDs to friendly names
+            # Map category IDs to category names
             df['category_display'] = df['category'].map(reverse_mapping)
             
             category_stats = df.groupby('category_display').agg({
@@ -473,7 +473,7 @@ def create_dashboard():
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("### 📋 Recent Predictions")
     
-    # Show last 10 predictions with product names and friendly category names
+    # Show last 10 predictions with product names and category names
     recent_df = df.tail(10).copy()
     recent_df = recent_df[['timestamp', 'product_name', 'category_display', 'predicted_price']]
     recent_df.columns = ['Timestamp', 'Product Name', 'Category', 'Predicted Price (RM)']
@@ -509,7 +509,7 @@ def create_dashboard():
         """, unsafe_allow_html=True)
     
     with col3:
-        # Find most common category with friendly name
+        # Find most common category 
         if 'category_display' in df.columns and len(df['category_display']) > 0:
             top_category = df['category_display'].mode()[0] if len(df['category_display'].mode()) > 0 else 'N/A'
         else:
@@ -553,7 +553,7 @@ def generate_report():
     categories = load_categories()
     reverse_mapping = categories['reverse_mapping']
     
-    # Map category IDs to friendly names
+    # Map category IDs to actual category names
     df['category_display'] = df['category'].map(reverse_mapping)
     
     # Calculate statistics
@@ -568,7 +568,7 @@ def generate_report():
     # Generate report timestamp
     report_time = datetime.now().strftime("%B %d, %Y at %I:%M %p")
     
-    # Modern Business Report Design
+    # Business Report Design
     st.markdown("""
         <style>
         .report-header {
@@ -845,7 +845,7 @@ def generate_report():
 def predict_price(model, preprocessor, feature_names, input_data):
     """Make prediction using the model - EXACTLY matching notebook preprocessing"""
     try:
-        # EXACT column order as X_train in notebook (CRITICAL!)
+        # EXACT column order as X_train in notebook
         column_order = [
             'order_status',
             'payment_sequential', 
@@ -862,10 +862,10 @@ def predict_price(model, preprocessor, feature_names, input_data):
             'product_category_name_english'
         ]
         
-        # Create DataFrame with EXACT column order
+        # Create DataFrame with exact column order
         input_df = pd.DataFrame([input_data], columns=column_order)
         
-        # Transform using preprocessor (13 cols -> 92 encoded features)
+        # Transform using preprocessor
         X_encoded = preprocessor.transform(input_df)
         
         # Get all feature names after encoding
@@ -879,7 +879,7 @@ def predict_price(model, preprocessor, feature_names, input_data):
                 feat_idx = all_feature_names.index(feat_name)
                 X_final[0, i] = X_encoded[0, feat_idx]
         
-        # Convert to DataFrame (model expects DataFrame)
+        # Convert to DataFrame
         X_final_df = pd.DataFrame(X_final, columns=feature_names)
         
         # Make prediction
@@ -996,7 +996,6 @@ def manual_input_form(model, preprocessor, feature_names, categories):
                 st.error("⚠️ Please enter a product name for tracking purposes.")
                 return
             
-            # SMART DEFAULTS for hidden fields (scientifically proven to have ZERO impact)
             defaults = {
                 'order_status': 'delivered',
                 'payment_sequential': 1,
@@ -1007,7 +1006,6 @@ def manual_input_form(model, preprocessor, feature_names, categories):
                 'product_photos_qty': 2
             }
             
-            # Prepare input data with EXACT 13 columns matching notebook training
             input_data = {
                 'order_status': defaults['order_status'],
                 'payment_sequential': defaults['payment_sequential'],
@@ -1096,7 +1094,7 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
         </div>
     """, unsafe_allow_html=True)
     
-    # Sample CSV template with simplified 7 columns
+    # Sample CSV template with columns
     sample_data = {
         'product_name': ['Samsung Galaxy S21', 'Office Chair Pro'],
         'product_category_name_english': ['Telephony', 'Office Furniture'],
@@ -1136,7 +1134,7 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
     st.markdown("### 📋 Available Product Categories")
     st.info("**Use these exact category names in your CSV file's `product_category_name_english` column.**")
     
-    # Get category mapping and display friendly names only
+    # Get category mapping and display category names only
     category_mapping = categories['category_mapping']
     category_items = list(category_mapping.keys())
     col1, col2, col3, col4 = st.columns(4)
@@ -1211,7 +1209,6 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
                     progress_bar = st.progress(0)
                     status_text = st.empty()
                     
-                    # Smart defaults for hidden fields
                     defaults = {
                         'order_status': 'delivered',
                         'payment_sequential': 1,
@@ -1222,19 +1219,18 @@ def csv_upload_form(model, preprocessor, feature_names, categories):
                         'product_photos_qty': 2
                     }
                     
-                    # Create reverse mapping for category conversion (friendly name -> internal value)
+                    # Create reverse mapping for category conversion
                     category_mapping = categories['category_mapping']
                     
                     for idx, row in df.iterrows():
                         # Convert category from friendly name to internal value if needed
                         category_value = row['product_category_name_english']
                         
-                        # If user provided friendly name (e.g., "Health & Beauty"), convert to internal value (e.g., "health_beauty")
+                        # If user provided category name , convert to internal id (e.g., "health_beauty")
                         if category_value in category_mapping:
                             category_value = category_mapping[category_value]
                         # If already internal value, use as-is
                         
-                        # Combine user input with defaults (EXACT column order matters!)
                         full_input = {
                             'order_status': defaults['order_status'],
                             'payment_sequential': defaults['payment_sequential'],
